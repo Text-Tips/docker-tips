@@ -19,7 +19,7 @@ RUN echo "export MAVEN_OPTS='-Xmx2096m -XX:MaxPermSize=1024m'" >> ~/.bashrc
 # Build from docker file with tag "odl_dev
 docker build -t=odl_dev .
 
-# Check docker containers running 
+# Check docker containers running
 docker ps
 
 # Check docker available images
@@ -35,7 +35,7 @@ sudo docker run -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -it --entry
 # Commit changes
 docker ps
 CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
-4f1466536024        odl_dev:latest      "/bin/bash"         3 minutes ago       Up 3 minutes                            lonely_albattani    
+4f1466536024        odl_dev:latest      "/bin/bash"         3 minutes ago       Up 3 minutes                            lonely_albattani
 
 docker commit 4f1466536024 odl_dev
 # NOTE: Docker commit: should never performed before having something working
@@ -58,7 +58,7 @@ docker ps --filter status=dead --filter status=exited -aq | xargs -r docker rm -
 
 # Attach to already running container
 docker attach 4f1466536024
-# or 
+# or
 docker exec -it 4f1466536024 /bin/bash
 # or by container name
 docker exec -it lonely_albattani /bin/bash
@@ -95,7 +95,7 @@ docker container cp - container_name:/tmp/destination_dir < orig.tar
 # Rename container from id
 docker container rename fab023423423 test
 
-# Check image 
+# Check image
 docker image inspect nginx:latest
 
 # Check image history
