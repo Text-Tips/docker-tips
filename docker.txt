@@ -1,0 +1,111 @@
+# Example Dockerfile
+------------------------------------------------------------------------------------------------------------------------------------
+FROM ubuntu:14.04
+RUN apt-get update
+RUN apt-get install -y git-core wget
+RUN apt-get install -y pkg-config vim emacs gdb gcc make ant g++ git libboost-dev libcurl4-openssl-dev\
+      libjson0-dev libssl-dev unixodbc-dev xmlstarlet
+RUN apt-get install -y wireshark
+RUN apt-get install -y software-properties-common
+RUN add-apt-repository ppa:openjdk-r/ppa
+RUN apt-get update
+RUN apt-get install -y openjdk-8-jdk
+RUN mkdir -p /usr/local/mvn
+RUN cd /usr/local/mvn && wget http://ftp.cixug.es/apache/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz -qO - | tar -xz
+RUN echo "export ODL_USERNAME='esergbr'" >> ~/.bashrc
+RUN echo "export MAVEN_OPTS='-Xmx2096m -XX:MaxPermSize=1024m'" >> ~/.bashrc
+------------------------------------------------------------------------------------------------------------------------------------
+
+# Build from docker file with tag "odl_dev
+docker build -t=odl_dev .
+
+# Check docker containers running 
+docker ps
+
+# Check docker available images
+docker images
+
+# Run and attach to docker image
+docker run -i -t --entrypoint /bin/bash odl_dev
+docker run -ti registry-proxy.engineering.redhat.com/rh-osbs/ubi9-minimal:latest /bin/bash
+
+# Start new shell with graphical interface
+sudo docker run -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -it --entrypoint /bin/bash odl_dev
+
+# Commit changes
+docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+4f1466536024        odl_dev:latest      "/bin/bash"         3 minutes ago       Up 3 minutes                            lonely_albattani    
+
+docker commit 4f1466536024 odl_dev
+# NOTE: Docker commit: should never performed before having something working
+
+# Check container details
+docker inspect 4f1466536024
+
+# Start new shell
+sudo docker exec -it 4f1466536024 /bin/bash
+
+# Remove docker image
+docker rmi "IMAGE_ID"
+docker rmi 51754adb41ec
+
+# Remove dangling images
+docker rmi $(docker images -f "dangling=true" -q)
+
+# Remove dangling containers
+docker ps --filter status=dead --filter status=exited -aq | xargs -r docker rm -v
+
+# Attach to already running container
+docker attach 4f1466536024
+# or 
+docker exec -it 4f1466536024 /bin/bash
+# or by container name
+docker exec -it lonely_albattani /bin/bash
+
+# Detach from Docker container without exiting
+Ctrl+p+q
+
+# Attaching to container running busybox
+docker exec -i -t ovs-node-4 /bin/busybox sh
+
+# Docker version
+docker version
+
+# Docker info
+docker info
+
+# Remove all containers
+docker container prune
+
+# Remove all images
+docker image prune -a
+
+# Remove all all all (caution, will clean everything)
+docker system prune -a -f
+
+# Remove all images (podman);(caution, will clean everything)
+podman system reset
+
+# Copy file from container
+docker container cp container_name:/tmp/file_to_copy .
+docker container cp container_name:/etc - > all_in_etc.tar
+docker container cp - container_name:/tmp/destination_dir < orig.tar
+
+# Rename container from id
+docker container rename fab023423423 test
+
+# Check image 
+docker image inspect nginx:latest
+
+# Check image history
+docker image history busybox
+
+# Save image to tgz
+docker save apigw:latest | gzip -c > /tmp/apigw_latest.tgz
+
+# Import image from tgz
+cat /tmp/apigw_latest.tgz | docker import - apigw:0.0.1
+
+# Search for a package in a registry (docker login might be required)
+docker search registry.access.redhat.com/ubi
