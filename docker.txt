@@ -109,3 +109,23 @@ cat /tmp/apigw_latest.tgz | docker import - apigw:0.0.1
 
 # Search for a package in a registry (docker login might be required)
 docker search registry.access.redhat.com/ubi
+
+Bootable containers:
+--------------------
+# 1 - Requirement 1: Install podman-bootc
+sudo dnf -y install 'dnf-command(copr)'
+sudo dnf -y copr enable gmaglione/podman-bootc
+sudo dnf -y install podman-bootc
+# 2 - Requirement 2: have podman machine installed:
+podman machine init --rootful --now
+# 3 - Export DOCKER_HOST as dumped by previous command:
+export DOCKER_HOST='unix:///run/user/4202331/podman/podman-machine-default-api.sock'
+# 4 - Create container image:
+FROM fedora-bootc:latest
+RUN dnf install -y clevis-pin-pkcs11
+COPY $my_content
+RUN $my_script
+# 5 - Build:
+podman build -fContainerfile
+# 6 - Run (remember to provide file system):
+podman-bootc run --filesystem xfs registry.fedoraproject.org/fedora-bootc:latest
